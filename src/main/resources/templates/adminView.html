@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org">
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Users</title>
+</head>
+<body>
+<h1>All Users' information</h1>
+<br>
+<div>
+    <table border="2">
+        <tr>
+            <th style="background-color: lightgray;">Name</th>
+            <th style="background-color: lightgray;">Surname</th>
+            <th style="background-color: lightgray;">Age</th>
+            <th style="background-color: lightgray;">Citizenship</th>
+            <th style="background-color: lightgray;">Password</th>
+            <th style="background-color: lightgray;">Role(s)</th>
+            <th style="background-color: lightgray;">Operations</th>
+        </tr>
+        <tr th:each="user : ${allUsers}">
+            <td th:text="${user.username}"></td>
+            <td th:text="${user.surname}"></td>
+            <td th:text="${user.age}"></td>
+            <td th:text="${user.citizenship}"></td>
+            <td th:text="${user.password}"></td>
+            <td th:text="${user.roles}"></td>
+            <td>
+                <input type="button" value="Update"
+                       style="background-color: lightblue; color: black;"
+                       th:onclick="'window.location.href=\'/admin/updateUser/' + ${user.id} + '\''"/>
+                <input type="button" value="Delete"
+                       style="background-color: lightpink; color: black;"
+                       th:onclick="'window.location.href=\'/admin/deleteUser/' + ${user.id} + '\''"/>
+            </td>
+        </tr>
+    </table>
+    <br>
+    <input type="button" value="Add" onclick="window.location.href='addNewUser'"/>
+<br><br>
+    <form action="/logout" method="post" style="display:inline;">
+        <input type="submit" value="Logout"/>
+    </form>
+
+</div>
+</body>
+</html>
