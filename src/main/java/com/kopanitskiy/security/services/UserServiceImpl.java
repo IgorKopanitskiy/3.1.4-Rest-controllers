@@ -67,10 +67,10 @@ public class UserServiceImpl implements UserService {
     @Transactional
     public void updateUser(Long id, User userUpdate, List<Long> roles) {
         User user = getUserById(id);
-        user.setUsername(userUpdate.getUsername());
+        user.setName(userUpdate.getName());
         user.setSurname(userUpdate.getSurname());
         user.setAge(userUpdate.getAge());
-        user.setCitizenship(userUpdate.getCitizenship());
+        user.setEmail(userUpdate.getEmail());
         user.setPassword(userUpdate.getPassword());
 
         // Преобразуем List<Long> в Set<Role>
@@ -91,15 +91,13 @@ public class UserServiceImpl implements UserService {
 
     @Override
     @Transactional
-    public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-        User user = userDao.findByUsername(username);
+    public UserDetails loadUserByUsername(String email) throws UsernameNotFoundException {
+        User user = userDao.findByEmail(email);
 
         if (user == null) {
-            throw new UsernameNotFoundException("Пользователь с именем " + username + "не найден");
+            throw new UsernameNotFoundException("Пользователь с логином " + email + "не найден");
         }
-
         return user;
     }
-
 }
 

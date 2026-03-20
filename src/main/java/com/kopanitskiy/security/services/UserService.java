@@ -21,5 +21,5 @@ public interface UserService extends UserDetailsService {
     public void updateUser(Long id, User userUpdate, List<Long> roles);
 
     @Override
-    UserDetails loadUserByUsername(String username);
+    UserDetails loadUserByUsername(String email);
 }

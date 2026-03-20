@@ -21,8 +21,8 @@ public class User implements UserDetails {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(name = "username")
-    private String username;
+    @Column(name = "name")
+    private String name;
 
     @Column(name = "surname")
     private String surname;
@@ -30,8 +30,8 @@ public class User implements UserDetails {
     @Column(name = "age")
     private int age;
 
-    @Column(name = "citizenship")
-    private String citizenship;
+    @Column(name = "email")
+    private String email;
 
     @Column(name = "password")
     private String password;
@@ -54,8 +54,10 @@ public class User implements UserDetails {
         this.id = id;
     }
 
-    public void setUsername(String username) {
-        this.username = username;
+    public String getName() {return  name; }
+
+    public void setName(String name) {
+        this.name = name;
     }
 
     public String getSurname() {
@@ -74,12 +76,12 @@ public class User implements UserDetails {
         this.age = age;
     }
 
-    public String getCitizenship() {
-        return citizenship;
+    public String getEmail() {
+        return email;
     }
 
-    public void setCitizenship(String citizenship) {
-        this.citizenship = citizenship;
+    public void setEmail(String citizenship) {
+        this.email = citizenship;
     }
 
     public void setPassword(String password) {
@@ -98,7 +100,7 @@ public class User implements UserDetails {
     public Collection<? extends GrantedAuthority> getAuthorities() {
 
         return roles.stream()
-                .map(role -> new SimpleGrantedAuthority(role.getRolename()))
+                .map(role -> new SimpleGrantedAuthority("ROLE_" + role.getRolename())) // Добавляем префикс ROLE_
                 .collect(Collectors.toList());
     }
 
@@ -109,7 +111,7 @@ public class User implements UserDetails {
 
     @Override
     public String getUsername() {
-        return username;
+        return email;
     }
 
     @Override
@@ -138,26 +140,26 @@ public class User implements UserDetails {
         User user = (User) o;
         return age == user.age &&
                 Objects.equals(id, user.id) &&
-                Objects.equals(username, user.username) &&
+                Objects.equals(name, user.name) &&
                 Objects.equals(surname, user.surname) &&
-                Objects.equals(citizenship, user.citizenship) &&
+                Objects.equals(email, user.email) &&
                 Objects.equals(password, user.password) &&
                 Objects.equals(roles, user.roles);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(id, username, surname, age, citizenship, password, roles);
+        return Objects.hash(id, name, surname, age, email, password, roles);
     }
 
     @Override
     public String toString() {
         return "User{" +
                 "id=" + id +
-                ", username='" + username + '\'' +
+                ", name='" + name + '\'' +
                 ", surname='" + surname + '\'' +
                 ", age=" + age +
-                ", citizenship='" + citizenship + '\'' +
+                ", email='" + email + '\'' +
                 ", password='" + password + '\'' +
                 ", roles=" + roles +
                 '}';

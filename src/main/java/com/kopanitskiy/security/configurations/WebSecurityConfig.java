@@ -31,6 +31,7 @@ public class WebSecurityConfig {
                         .anyRequest().authenticated()
                 )
                 .formLogin(form -> form
+                        .loginPage("/login")
                         .successHandler(successUserHandler) // Устанавливаем обработчик успешного входа
                         .permitAll() // Разрешаем доступ к форме входа
                 )
