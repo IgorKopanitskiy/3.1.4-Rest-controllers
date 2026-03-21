@@ -31,15 +31,13 @@ public class UserServiceImpl implements UserService {
     @Override
     @Transactional
     public void saveUser(User user, List<Long> roles) {
-        if (roles != null) {
-            Set<Role> roleSet = new HashSet<>();
-            for (Long roleId : roles) {
-                Role role = roleService.getRoleById(roleId);
-                if (role == null) {
-                    throw new IllegalArgumentException("Роль с id: " + roleId + " не найдена");
-                }
-                roleSet.add(role);
+        if (roles != null && !roles.isEmpty()) {
+            List<Role> roleList = roleService.getRolesByIds(roles);
+            if (roleList.size() != roles.size()) {
+                throw new IllegalArgumentException("Некоторые роли не найдены для идентификаторов: " + roles);
             }
+
+            Set<Role> roleSet = new HashSet<>(roleList);
             user.setRoles(roleSet);
         }
 
@@ -59,8 +57,7 @@ public class UserServiceImpl implements UserService {
     @Override
     @Transactional
     public void deleteUser(Long id) {
-        User user = getUserById(id);
-        userDao.delete(user);
+        userDao.deleteById(id);
     }
 
     @Override
@@ -73,31 +70,22 @@ public class UserServiceImpl implements UserService {
         user.setEmail(userUpdate.getEmail());
         user.setPassword(userUpdate.getPassword());
 
-        // Преобразуем List<Long> в Set<Role>
-        if (roles != null) {
-            Set<Role> roleSet = new HashSet<>();
-            for (Long roleId : roles) {
-                Role role = roleService.getRoleById(roleId);
-                if (role == null) {
-                    throw new IllegalArgumentException("Роль с id: " + roleId + " не найдена");
-                }
-                roleSet.add(role);
+        if (roles != null && !roles.isEmpty()) {
+            List<Role> roleList = roleService.getRolesByIds(roles);
+            if (roleList.size() != roles.size()) {
+                throw new IllegalArgumentException("Некоторые роли не найдены для идентификаторов: " + roles);
             }
+            Set<Role> roleSet = new HashSet<>(roleList);
             user.setRoles(roleSet);
         }
-
         userDao.save(user);
     }
 
     @Override
     @Transactional
     public UserDetails loadUserByUsername(String email) throws UsernameNotFoundException {
-        User user = userDao.findByEmail(email);
-
-        if (user == null) {
-            throw new UsernameNotFoundException("Пользователь с логином " + email + "не найден");
-        }
-        return user;
+        return userDao.findByEmail(email)
+                .orElseThrow(() -> new UsernameNotFoundException("Пользователь с логином " + email + "не найден"));
     }
 }
 

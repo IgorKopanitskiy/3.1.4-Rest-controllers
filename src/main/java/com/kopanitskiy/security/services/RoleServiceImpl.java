@@ -7,6 +7,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 
+import java.util.Collections;
 import java.util.List;
 
 @Service
@@ -22,9 +23,17 @@ public class RoleServiceImpl implements RoleService{
 
     @Override
     @Transactional
-    public Role getRoleById(Long id) {
-        return roleDao.findById(id)
-                .orElseThrow(() -> new RuntimeException("Роль пользователя с id: " + id + "не найдена"));
+    public List<Role> getRolesByIds(List<Long> roleIds) {
+        if (roleIds == null || roleIds.isEmpty()) {
+            return Collections.emptyList();
+        }
+        List<Role> roles = roleDao.findByRoleIDs(roleIds);
+
+        if (roles.isEmpty()) {
+            throw new RuntimeException("Роли не найдены для указанных идентификаторов: " + roleIds);
+        }
+
+        return roles;
     }
 
 }

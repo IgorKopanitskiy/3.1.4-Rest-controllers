@@ -20,13 +20,7 @@ public class AdminController {
     private final UserServiceImpl userService;
 
 
-    @GetMapping(value = "")
-    public String welcome() {
-        return "redirect:/admin/showAll";
-    }
-
-
-    @GetMapping("/showAll")
+    @GetMapping("/users")
     public String showAll(@AuthenticationPrincipal User user, Model model) {
         model.addAttribute("allUsers", userService.getAllUsers());
         model.addAttribute("user", user);
@@ -35,7 +29,7 @@ public class AdminController {
     }
 
 
-    @GetMapping("/addNewUser")
+    @GetMapping("/users/new")
     public String addNew(@AuthenticationPrincipal User user, Model model) {
         model.addAttribute("user", user);
         List<Role> allRoles = roleService.getAllRoles();
@@ -44,27 +38,27 @@ public class AdminController {
     }
 
 
-    @PostMapping("/saveUser")
+    @PostMapping("/users")
     public String save(@ModelAttribute("user") User user,
                        @RequestParam(required = false) List<Long> roles) {
         userService.saveUser(user, roles);
-        return "redirect:/admin/showAll";
+        return "redirect:/admin/users";
     }
 
 
-    @PostMapping("/updateUser/{id}")
+    @PostMapping("/users/{id}/update")
     public String updateUser(@PathVariable("id") long id,
                              @ModelAttribute("user") User user,
                              @RequestParam(required = false) List<Long> roles) {
         System.out.println("Метод post работает с id" + id);
         userService.updateUser(id, user, roles);
-        return "redirect:/admin/showAll";
+        return "redirect:/admin/users";
     }
 
-    @PostMapping("/deleteUser/{id}")
+    @PostMapping("/users/{id}/delete")
     public String deleteById(@PathVariable("id") long id) {
         userService.deleteUser(id);
-        return "redirect:/admin/showAll";
+        return "redirect:/admin/users";
     }
 }
 

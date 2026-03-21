@@ -9,7 +9,7 @@ public interface RoleService {
 
     public List<Role> getAllRoles();
 
-    public Role getRoleById(Long id);
+    public List<Role> getRolesByIds(List<Long> roleIds);
 
 
 }
