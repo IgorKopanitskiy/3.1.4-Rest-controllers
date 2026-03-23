@@ -28,19 +28,17 @@ public class UserServiceImpl implements UserService {
         return userDao.findAll();
     }
 
+    //Приватный метод, чтобы не дублировать код
+    private void setUserRoles(User user, List<Long> roles) {
+        List<Role> roleList = roleService.getRolesByIds(roles);
+        Set<Role> roleSet = new HashSet<>(roleList);
+        user.setRoles(roleSet);
+    }
+
     @Override
     @Transactional
     public void saveUser(User user, List<Long> roles) {
-        if (roles != null && !roles.isEmpty()) {
-            List<Role> roleList = roleService.getRolesByIds(roles);
-            if (roleList.size() != roles.size()) {
-                throw new IllegalArgumentException("Некоторые роли не найдены для идентификаторов: " + roles);
-            }
-
-            Set<Role> roleSet = new HashSet<>(roleList);
-            user.setRoles(roleSet);
-        }
-
+        setUserRoles(user, roles);
         String encodedPassword = bCryptPasswordEncoder.encode(user.getPassword());
         user.setPassword(encodedPassword);
         userDao.save(user);
@@ -70,14 +68,8 @@ public class UserServiceImpl implements UserService {
         user.setEmail(userUpdate.getEmail());
         user.setPassword(userUpdate.getPassword());
 
-        if (roles != null && !roles.isEmpty()) {
-            List<Role> roleList = roleService.getRolesByIds(roles);
-            if (roleList.size() != roles.size()) {
-                throw new IllegalArgumentException("Некоторые роли не найдены для идентификаторов: " + roles);
-            }
-            Set<Role> roleSet = new HashSet<>(roleList);
-            user.setRoles(roleSet);
-        }
+        setUserRoles(user, roles);
+
         userDao.save(user);
     }
 

@@ -24,15 +24,19 @@ public class RoleServiceImpl implements RoleService{
     @Override
     @Transactional
     public List<Role> getRolesByIds(List<Long> roleIds) {
-        if (roleIds == null || roleIds.isEmpty()) {
-            return Collections.emptyList();
+        if (roleIds == null) {
+            throw new IllegalArgumentException("Список идентификаторов ролей не может быть null");
         }
+
+        if (roleIds.isEmpty()) {
+            throw new IllegalArgumentException("Список идентификаторов ролей не может быть пустым");
+        }
+
         List<Role> roles = roleDao.findByRoleIDs(roleIds);
 
         if (roles.isEmpty()) {
             throw new RuntimeException("Роли не найдены для указанных идентификаторов: " + roleIds);
         }
-
         return roles;
     }
 
