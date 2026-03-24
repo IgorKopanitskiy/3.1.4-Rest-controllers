@@ -31,6 +31,7 @@ public class UserServiceImpl implements UserService {
     //Приватный метод, чтобы не дублировать код
     private void setUserRoles(User user, List<Long> roles) {
         List<Role> roleList = roleService.getRolesByIds(roles);
+
         Set<Role> roleSet = new HashSet<>(roleList);
         user.setRoles(roleSet);
     }
