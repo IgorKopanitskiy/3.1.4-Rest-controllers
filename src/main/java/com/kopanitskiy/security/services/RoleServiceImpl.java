@@ -26,6 +26,10 @@ public class RoleServiceImpl implements RoleService{
     @Transactional
     public List<Role> getRolesByIds(List<Long> roleIds) {
 
+        if (roleIds==null) {
+            throw new RuntimeException("Идентификатор ролей не может быть null");
+        }
+
         List<Role> roles = roleDao.findByRoleIDs(roleIds);
 
         if (roles.isEmpty()) {
