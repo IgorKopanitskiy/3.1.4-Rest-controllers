@@ -10,16 +10,16 @@ import java.util.List;
 
 public interface UserService extends UserDetailsService {
 
-    public List<User> getAllUsers();
+    List<User> getAllUsers();
 
-    public void saveUser(User user, List<Long> roles);
+    void saveUser(User user);
 
-    public User getUserById(Long id);
+    User getUserById(Long id);
 
-    public void deleteUser(Long id);
+    void deleteUserById(Long id);
 
-    public void updateUser(Long id, User userUpdate, List<Long> roles);
+    void updateUser(User userUpdate);
 
     @Override
-    UserDetails loadUserByUsername(String email);
+    UserDetails loadUserByUsername(String username);
 }

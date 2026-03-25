@@ -29,17 +29,16 @@ public class UserServiceImpl implements UserService {
     }
 
     //Приватный метод, чтобы не дублировать код
-    private void setUserRoles(User user, List<Long> roles) {
-        List<Role> roleList = roleService.getRolesByIds(roles);
-
-        Set<Role> roleSet = new HashSet<>(roleList);
-        user.setRoles(roleSet);
-    }
+//    private void setUserRoles(User user, List<Long> roles) {
+//        List<Role> roleList = roleService.getRolesByIds(roles);
+//
+//        Set<Role> roleSet = new HashSet<>(roleList);
+//        user.setRoles(roleSet);
+//    }
 
     @Override
     @Transactional
-    public void saveUser(User user, List<Long> roles) {
-        setUserRoles(user, roles);
+    public void saveUser(User user) {
         String encodedPassword = bCryptPasswordEncoder.encode(user.getPassword());
         user.setPassword(encodedPassword);
         userDao.save(user);
@@ -55,30 +54,22 @@ public class UserServiceImpl implements UserService {
 
     @Override
     @Transactional
-    public void deleteUser(Long id) {
+    public void deleteUserById(Long id) {
         userDao.deleteById(id);
     }
 
     @Override
     @Transactional
-    public void updateUser(Long id, User userUpdate, List<Long> roles) {
-        User user = getUserById(id);
-        user.setName(userUpdate.getName());
-        user.setSurname(userUpdate.getSurname());
-        user.setAge(userUpdate.getAge());
-        user.setEmail(userUpdate.getEmail());
-        user.setPassword(userUpdate.getPassword());
-
-        setUserRoles(user, roles);
-
-        userDao.save(user);
+    public void updateUser(User userUpdate) {
+        userDao.save(userUpdate);
     }
+
 
     @Override
     @Transactional
-    public UserDetails loadUserByUsername(String email) throws UsernameNotFoundException {
-        return userDao.findByEmail(email)
-                .orElseThrow(() -> new UsernameNotFoundException("Пользователь с логином " + email + "не найден"));
+    public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
+        return userDao.findByUsername(username)
+                .orElseThrow(() -> new UsernameNotFoundException("Пользователь с логином " + username + "не найден"));
     }
 }
 

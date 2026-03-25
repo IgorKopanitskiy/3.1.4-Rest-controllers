@@ -2,6 +2,7 @@ package com.kopanitskiy.security.services;
 
 import com.kopanitskiy.security.entities.Role;
 import com.kopanitskiy.security.repositories.RoleDao;
+import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
