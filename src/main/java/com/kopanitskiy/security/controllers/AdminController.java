@@ -1,8 +1,9 @@
 package com.kopanitskiy.security.controllers;
 
+import com.kopanitskiy.security.entities.Role;
 import com.kopanitskiy.security.entities.User;
 import com.kopanitskiy.security.exceptionHandling.UserIncorrectData;
-import com.kopanitskiy.security.exceptionHandling.UsernameExistsException;
+import com.kopanitskiy.security.services.RoleService;
 import com.kopanitskiy.security.services.UserServiceImpl;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -20,13 +21,24 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 public class AdminController {
     private final UserServiceImpl userService;
+    private final RoleService roleService;
 
 
     @GetMapping("/users")
-    public ResponseEntity<List<User>> showAll() {
+    public ResponseEntity<List<User>> getAllUsers() {
         return new ResponseEntity<>(userService.getAllUsers(), HttpStatus.OK);
     }
 
+    @GetMapping("/roles")
+    public ResponseEntity<List<Role>> getAllRoles() {
+        return new ResponseEntity<>(roleService.getAllRoles(), HttpStatus.OK);
+    }
+
+    @GetMapping(value = "users/{id}")
+    public ResponseEntity<User> getById(@PathVariable("id") long id) {
+        User user = userService.getUserById(id);
+        return new ResponseEntity<>(user, HttpStatus.OK);
+    }
 
 
     @PostMapping("/users")
@@ -35,41 +47,39 @@ public class AdminController {
             String error = getErrorsFromBindingResult(bindingResult);
             return new ResponseEntity<>(new UserIncorrectData(error), HttpStatus.BAD_REQUEST);
         }
-        try {
-            userService.saveUser(user);
-            return new ResponseEntity<>(HttpStatus.OK);
-        }catch (UsernameExistsException exception) {
-            throw new UsernameExistsException("Пользователь с таким логином уже существует");
-        }
-    }
 
-    @DeleteMapping("/users/{id}")
-    public ResponseEntity<UserIncorrectData> delete(@PathVariable("id") long id) {
-        userService.deleteUserById(id);
-        return new ResponseEntity<>(new UserIncorrectData("Пользователь c id: " + id + " удален"), HttpStatus.OK);
+        List<Long> roleIds = user.getRoles().stream()
+                .map(Role::getId)
+                .toList();
+
+        userService.saveUser(user, roleIds);
+        return new ResponseEntity<>(HttpStatus.OK);
     }
 
 
     @PutMapping("/users/{id}")
+
     public ResponseEntity<UserIncorrectData> update(@PathVariable("id") long id,
-                                                  @Valid @RequestBody User user,
-                                                  BindingResult bindingResult) {
+                                                    @Valid @RequestBody User user,
+                                                    BindingResult bindingResult) {
         if (bindingResult.hasErrors()) {
             String error = getErrorsFromBindingResult(bindingResult);
             return new ResponseEntity<>(new UserIncorrectData(error), HttpStatus.BAD_REQUEST);
         }
-        try {
-            String oldPassword = userService.getUserById(id).getPassword();
-            if (oldPassword.equals(user.getPassword())) {
-                user.setPassword(oldPassword);
-                userService.updateUser(user);
-            } else {
-                userService.saveUser(user);
-            }
-            return new ResponseEntity<>(HttpStatus.OK);
-        }catch (UsernameExistsException exception) {
-            throw new UsernameExistsException("Пользователь с таким логином уже существует");
-        }
+
+        List<Long> roleIds = user.getRoles().stream()
+                .map(Role::getId)
+                .toList();
+
+        userService.updateUser(id, user, roleIds);
+        return new ResponseEntity<>(HttpStatus.OK);
+    }
+
+
+    @DeleteMapping("/users/{id}")
+    public ResponseEntity<Void> delete(@PathVariable("id") long id) {
+        userService.deleteUserById(id);
+        return ResponseEntity.ok().build();
     }
 
     //Ошибки валидации

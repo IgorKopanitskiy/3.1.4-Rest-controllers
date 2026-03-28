@@ -28,10 +28,17 @@ public class UserServiceImpl implements UserService {
         return userDao.findAll();
     }
 
+    //Приватный метод, чтобы не дублировать код
+    private void setUserRoles(User user, List<Long> roles) {
+        List<Role> roleList = roleService.getRolesByIds(roles);
+        Set<Role> roleSet = new HashSet<>(roleList);
+        user.setRoles(roleSet);
+    }
 
     @Override
     @Transactional
-    public void saveUser(User user) {
+    public void saveUser(User user, List<Long> roles) {
+        setUserRoles(user, roles);
         String encodedPassword = bCryptPasswordEncoder.encode(user.getPassword());
         user.setPassword(encodedPassword);
         userDao.save(user);
@@ -53,8 +60,21 @@ public class UserServiceImpl implements UserService {
 
     @Override
     @Transactional
-    public void updateUser(User userUpdate) {
-        userDao.save(userUpdate);
+    public void updateUser(Long id, User userUpdate, List<Long> roles) {
+        User user = getUserById(id);
+        user.setName(userUpdate.getName());
+        user.setSurname(userUpdate.getSurname());
+        user.setAge(userUpdate.getAge());
+        user.setUsername(userUpdate.getUsername());
+        user.setPassword(userUpdate.getPassword());
+
+        if (userUpdate.getPassword() != null && !userUpdate.getPassword().isEmpty()) {
+            String encodedPassword = bCryptPasswordEncoder.encode(userUpdate.getPassword());
+            user.setPassword(encodedPassword);
+        }
+        setUserRoles(user, roles);
+
+        userDao.save(user);
     }
 
 

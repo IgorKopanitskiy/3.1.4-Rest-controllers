@@ -12,13 +12,13 @@ public interface UserService extends UserDetailsService {
 
     List<User> getAllUsers();
 
-    void saveUser(User user);
+    void saveUser(User user, List<Long> roles);
 
     User getUserById(Long id);
 
     void deleteUserById(Long id);
 
-    void updateUser(User userUpdate);
+    void updateUser(Long id, User userUpdate, List<Long> roles);
 
     @Override
     UserDetails loadUserByUsername(String username);

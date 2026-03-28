@@ -1,10 +1,8 @@
-let roleList = [
-    {id: 1, rolename: "USER"},
-    {id: 2, rolename: "ADMIN"}
-]
+let roleList = []
 let isUser = true;
 
 $(async function () {
+    await loadRoles();
     await getUser();
     await infoUser();
     await tittle();
@@ -22,12 +20,23 @@ const userFetch = {
         'Referer': null
     },
     findAllUsers: async () => await fetch('api/admin/users'),
+    findAllRoles: async () => await fetch ('api/admin/roles'),
     findUserByUsername: async () => await fetch(`api/user`),
-    findOneUser: async (id) => await fetch(`api/user/${id}`),
+    findOneUser: async (id) => await fetch(`api/admin/users/${id}`),
     addNewUser: async (user) => await fetch('api/admin/users', {method: 'POST', headers: userFetch.head, body: JSON.stringify(user)}),
     updateUser: async (user, id) => await fetch(`api/admin/users/${id}`, {method: 'PUT', headers: userFetch.head, body: JSON.stringify(user)}),
     deleteUser: async (id) => await fetch(`api/admin/users/${id}`, {method: 'DELETE', headers: userFetch.head})
 }
+
+async function loadRoles() {
+    await userFetch.findAllRoles()
+        .then(res => res.json())
+        .then(roles => {
+            roleList = roles; // Сохраняем роли в переменную roleList
+        });
+}
+
+
 
 async function infoUser() {
     let temp = '';
@@ -329,7 +338,7 @@ async function deleteUser(modal, id) {
 }
 
 async function editUser(modal, id) {
-
+    await loadRoles();
     let oneUser = await userFetch.findOneUser(id);
     let user = oneUser.json();
 
@@ -376,16 +385,20 @@ async function editUser(modal, id) {
                 
                 <div class="form-group">
                     <label for="roles" class="com-form-label">Role</label>
-                    <select multiple id="roles" size="2" class="form-control" style="max-height: 100px">
-                    <option value="USER">USER</option>
-                    <option value="ADMIN">ADMIN</option>
-                    </select>
+                    <select multiple id="roles" class="form-control" style="max-height: 100px">
+                </select>
                 </div>
             </form>
         `;
         modal.find('.modal-body').append(bodyForm);
 
         let rolesSelect = document.getElementById('roles');
+        roleList.forEach(role => {
+            let option = document.createElement('option');
+            option.value = role.rolename;
+            option.textContent = role.rolename;
+            rolesSelect.appendChild(option);
+        });
 
         user.roles.forEach(role => {
             let option = rolesSelect.querySelector(`[value="${role.rolename}"]`);
